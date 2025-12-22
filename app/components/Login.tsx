@@ -1,8 +1,19 @@
 
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Controller, useForm } from 'react-hook-form';
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { z } from 'zod';
+import { logIn } from '../utils/auth';
+
+const schema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(1, 'Password is required'),
+});
+
+type FormData = z.infer<typeof schema>;
 
 interface LoginProps {
   onSwitchToSignup: () => void;
@@ -11,6 +22,22 @@ interface LoginProps {
 export default function Login({ onSwitchToSignup }: LoginProps) {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const router = useRouter();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  });
+
+  const onSubmit = (data: FormData) => {
+    try {
+      logIn(data);
+      router.push('/(tabs)/classes');
+    } catch (error: any) {
+      Alert.alert('Login Failed', error.message);
+    }
+  };
 
   return (
     <>
@@ -28,14 +55,24 @@ export default function Login({ onSwitchToSignup }: LoginProps) {
       <Text style={styles.label}>Email</Text>
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons name="email-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
-        <TextInput
-          style={styles.input}
-          placeholder="teacher@school.edu"
-          placeholderTextColor="#9CA3AF"
-          keyboardType="email-address"
-          autoCapitalize="none"
+        <Controller
+          control={control}
+          name="email"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              placeholder="teacher@school.edu"
+              placeholderTextColor="#9CA3AF"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+            />
+          )}
         />
       </View>
+      {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
 
       <View style={styles.passwordLabelContainer}>
         <Text style={styles.label}>Password</Text>
@@ -45,18 +82,28 @@ export default function Login({ onSwitchToSignup }: LoginProps) {
       </View>
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons name="lock-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
-        <TextInput
-          style={styles.input}
-          placeholder="••••••••"
-          placeholderTextColor="#9CA3AF"
-          secureTextEntry={!passwordVisible}
+        <Controller
+          control={control}
+          name="password"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              placeholder="••••••••"
+              placeholderTextColor="#9CA3AF"
+              secureTextEntry={!passwordVisible}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+            />
+          )}
         />
         <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
           <Ionicons name={passwordVisible ? 'eye-off-outline' : 'eye-outline'} size={20} color="#9CA3AF" />
         </TouchableOpacity>
       </View>
+      {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
 
-      <TouchableOpacity style={styles.loginButton} onPress={() => router.push('/(tabs)/classes')}>
+      <TouchableOpacity style={styles.loginButton} onPress={handleSubmit(onSubmit)}>
         <Text style={styles.loginButtonText}>Log In</Text>
         <Ionicons name="arrow-forward" size={20} color="white" />
       </TouchableOpacity>
@@ -208,5 +255,9 @@ const styles = StyleSheet.create({
   supportLink: {
     color: '#0099ff',
     fontWeight: 'bold',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 10,
   },
 });
