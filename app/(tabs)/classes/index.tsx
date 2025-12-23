@@ -66,7 +66,7 @@ export default function MyClasses() {
 
   return (
     <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-      <ScrollView style={styles.container}>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <Image source={user.avatar} style={styles.avatar} />
