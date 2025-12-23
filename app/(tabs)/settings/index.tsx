@@ -1,5 +1,5 @@
-
 import { FontAwesome } from '@expo/vector-icons';
+import { Link } from 'expo-router';
 import React from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -20,13 +20,14 @@ export default function Settings() {
                     <Text style={styles.profileName}>{user.name}</Text>
                     <Text style={styles.profileTitle}>{user.title}</Text>
                 </View>
-                <Pressable>
+                <Link href="/edit-profile">
                     <FontAwesome name="pencil" size={24} color="#3B82F6" />
-                </Pressable>
+                </Link>
             </View>
 
             <Text style={styles.sectionTitle}>ACCOUNT & PREFERENCES</Text>
             <View style={styles.card}>
+                <Link href="/edit-profile" asChild>
                 <Pressable style={styles.cardRow}>
                     <View style={styles.cardIcon}>
                         <FontAwesome name="user" size={20} color="#3B82F6" />
@@ -34,6 +35,7 @@ export default function Settings() {
                     <Text style={styles.cardText}>Edit Profile</Text>
                     <FontAwesome name="chevron-right" size={20} color="#637588" />
                 </Pressable>
+                </Link>
                 <View style={styles.divider} />
                 <Pressable style={styles.cardRow}>
                     <View style={styles.cardIcon}>
