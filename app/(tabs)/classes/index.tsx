@@ -97,7 +97,7 @@ export default function MyClasses() {
             </View>
 
             <View style={styles.classList}>
-                {classes.map((item) => (
+                {filteredClasses.map((item) => (
                     <View key={item.id} style={styles.classItem}>
                         <View style={styles.classInfo}>
                             <View style={styles.classStudents}>
